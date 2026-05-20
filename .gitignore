@@ -1,0 +1,31 @@
+# Go 빌드 산출물
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go 테스트 산출물
+*.test
+*.out
+
+# Go 모듈 vendor 디렉토리
+vendor/
+
+# Agent 런타임 식별자 — 머신/인스턴스별 영구 식별자이므로 커밋 금지
+# (spec v0.2.1 §3.1)
+.agent_id
+
+# LOG_JOB file_state 영속 디렉토리 — Agent local only (spec §5.2.3 노트)
+.agent_state/
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code 워크스페이스 (도구 산출물 — plan, 임시 출력 등)
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
