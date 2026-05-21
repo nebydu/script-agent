@@ -7,14 +7,21 @@
 //  4. Dispatcher + Runners 구성 (Runners는 단계 D/E에서 등록)
 //  5. AGENT_STARTED 발행 (best-effort)
 //  6. commands consumer goroutine 시작
-//  7. signal 대기 (SIGINT/SIGTERM)
-//  8. consumer cancel + dispatcher drain (5s budget)
+//  7. signal 또는 consumer 자기 종료(publish 실패 등) 대기
+//  8. consumer cancel — 진행 중인 Dispatch도 ctx cancel로 조기 종료
 //  9. AGENT_STOPPED 발행 (5s budget) + writer close
+//
+// fail-fast + exit code 정책: publish 실패 시 consumer가 error 반환 →
+// run()이 exit code 1로 종료 → supervisor(systemd/k8s 등)가 재기동.
+// exit code 0(정상 signal)에서는 supervisor가 재기동하지 않으므로 두
+// 경로를 반드시 구분해야 한다. main은 os.Exit(run())만 호출하고 정리는
+// run() 안의 defer에 맡긴다 — os.Exit는 defer를 실행하지 않기 때문.
 package main
 
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -32,7 +39,20 @@ import (
 	"monitoring/script-agent/internal/model"
 )
 
+// 종료 코드 (supervisor 재기동 정책과 직결):
+//   exitOK     = 0 — 정상 signal 종료
+//   exitFatal  = 1 — 부팅 실패 (agent_id 등) 또는 consumer self-terminate.
+//                    supervisor가 재기동 → last committed offset부터 redeliver.
+const (
+	exitOK    = 0
+	exitFatal = 1
+)
+
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	cfg := config.Load()
 
 	logger := newLogger(cfg.LogLevel)
@@ -41,7 +61,7 @@ func main() {
 	agentID, err := identity.GetOrCreate(cfg.AgentIDPath)
 	if err != nil {
 		logger.Error("failed to resolve agent_id", "error", err, "path", cfg.AgentIDPath)
-		os.Exit(1)
+		return exitFatal
 	}
 
 	// Kafka writer. Async=false + RequireAll로 매 WriteMessage가 broker
@@ -91,43 +111,59 @@ func main() {
 		"agent_version", cfg.AgentVersion,
 	)
 
-	// commands consumer.
+	// commands consumer. consumer가 publish 실패 등으로 자기 종료할 수
+	// 있으므로 error도 보관 — main이 signal 또는 consumer 종료 중 먼저
+	// 발생한 쪽을 reason으로 삼는다.
 	consumerDone := make(chan struct{})
+	var consumerErr error
 	go func() {
 		defer close(consumerDone)
-		consumeCommands(consumerCtx, reader, dispatcher, logger)
+		consumerErr = consumeCommands(consumerCtx, reader, dispatcher, logger)
 	}()
 
 	// signal 대기. metadata.reason에 signal 이름을 그대로 넣기 위해
 	// 명시적 채널 유지.
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
-	sig := <-sigCh
-	signal.Stop(sigCh)
 
-	logger.Info("shutdown signal received", "signal", sig.String())
-
-	// consumer 정리: 새 명령 fetch 중단, 진행 중 Job goroutine은 ctx 통해
-	// 종료 시도 (예: exec.CommandContext가 자식 프로세스 kill).
-	cancelConsumer()
-	<-consumerDone
-
-	// inflight Job drain (best-effort, 5s).
-	drainDone := make(chan struct{})
-	go func() {
-		dispatcher.Wait()
-		close(drainDone)
-	}()
+	var (
+		stopReason string
+		exitCode   int
+	)
 	select {
-	case <-drainDone:
-	case <-time.After(5 * time.Second):
-		logger.Warn("inflight jobs did not drain in 5s — proceeding to shutdown")
+	case sig := <-sigCh:
+		stopReason = sig.String()
+		exitCode = exitOK
+		logger.Info("shutdown signal received", "signal", stopReason)
+		// 새 명령 fetch 중단, 진행 중인 Dispatch도 ctx cancel로 빠르게
+		// 반환. consumerDone 닫힘이 곧 inflight drain.
+		cancelConsumer()
+		<-consumerDone
+	case <-consumerDone:
+		// consumer가 자기 종료 (publish 실패 등). last committed offset부터
+		// 재기동 시 redeliver되도록 fail-fast + exit 1.
+		if consumerErr != nil {
+			stopReason = "consumer-error"
+			exitCode = exitFatal
+			logger.Error("consumer terminated — initiating shutdown to preserve at-least-once",
+				"error", consumerErr,
+			)
+		} else {
+			// 정상 종료 경로가 신호 없이 일어나는 경우는 없지만 방어적 처리.
+			// exit 0 — supervisor 재기동 불필요 (이 경로 자체가 비정상이지만
+			// 데이터 손실은 없으므로).
+			stopReason = "consumer-exit"
+			exitCode = exitOK
+			logger.Warn("consumer exited without error or signal")
+		}
+		cancelConsumer() // 이미 종료됐지만 ctx 정리.
 	}
+	signal.Stop(sigCh)
 
 	// AGENT_STOPPED + 5s 발행 timeout.
 	shutdownCtx, cancelShutdown := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelShutdown()
-	if err := auditor.AgentStopped(shutdownCtx, sig.String()); err != nil {
+	if err := auditor.AgentStopped(shutdownCtx, stopReason); err != nil {
 		logger.Warn("failed to publish AGENT_STOPPED", "error", err)
 	}
 
@@ -140,21 +176,30 @@ func main() {
 
 	logger.Info("agent stopped",
 		"agent_id", agentID,
-		"reason", sig.String(),
+		"reason", stopReason,
+		"exit_code", exitCode,
 	)
+	return exitCode
 }
 
 // consumeCommands는 commands 토픽을 끝없이 fetch + dispatch한다.
-// ctx cancel 시 정상 반환. bad message(json unmarshal 실패)는 commit해
-// 무한 재시도를 피한다.
-func consumeCommands(ctx context.Context, reader *kafka.Reader, dispatcher *job.Dispatcher, logger *slog.Logger) {
+//
+// 반환값:
+//   - nil + ctx cancelled: 정상 shutdown 경로
+//   - non-nil error: fail-fast 경로. publish 실패나 commit 실패는 더 이상
+//     처리해선 안 된다 (out-of-order commit 시 손실). 호출 측이 Agent를
+//     종료해 재기동 시 last committed offset부터 redeliver되게 한다.
+//
+// bad message(json unmarshal 실패)는 commit해 poison-pill 회피.
+func consumeCommands(ctx context.Context, reader *kafka.Reader, dispatcher *job.Dispatcher, logger *slog.Logger) error {
 	r := reader.Underlying()
 	for {
 		msg, err := r.FetchMessage(ctx)
 		if err != nil {
 			if ctx.Err() != nil {
-				return
+				return nil
 			}
+			// fetch transient 오류는 재시도 (kafka-go 내부 reconnect).
 			logger.Warn("failed to fetch command", "error", err)
 			continue
 		}
@@ -165,16 +210,37 @@ func consumeCommands(ctx context.Context, reader *kafka.Reader, dispatcher *job.
 				"error", err,
 				"offset", msg.Offset,
 			)
-			if commitErr := r.CommitMessages(ctx, msg); commitErr != nil && ctx.Err() == nil {
-				logger.Warn("failed to commit bad message", "error", commitErr)
+			if commitErr := r.CommitMessages(ctx, msg); commitErr != nil {
+				if ctx.Err() != nil {
+					return nil
+				}
+				return fmt.Errorf("commit bad message at offset %d: %w", msg.Offset, commitErr)
 			}
 			continue
 		}
 
-		dispatcher.Dispatch(ctx, cmd)
+		// Dispatch는 동기 — Runner 실행 + 결과/감사 발행 시도까지 완료 후
+		// 반환한다. error는 publish 실패 등 commit 금지 신호.
+		if err := dispatcher.Dispatch(ctx, cmd); err != nil {
+			if ctx.Err() != nil {
+				// shutdown 진행 중이면 정상 종료 경로. commit 건너뛰고 반환 —
+				// 재기동 시 같은 명령 redeliver.
+				return nil
+			}
+			// publish 실패. commit하면 손실 → fail-fast로 종료.
+			return fmt.Errorf("dispatch failed at offset %d (execution_id=%s): %w",
+				msg.Offset, cmd.ExecutionID, err)
+		}
 
-		if err := r.CommitMessages(ctx, msg); err != nil && ctx.Err() == nil {
-			logger.Warn("failed to commit offset", "error", err)
+		if ctx.Err() != nil {
+			return nil
+		}
+
+		if err := r.CommitMessages(ctx, msg); err != nil {
+			if ctx.Err() != nil {
+				return nil
+			}
+			return fmt.Errorf("commit offset %d: %w", msg.Offset, err)
 		}
 	}
 }

@@ -38,6 +38,20 @@ go run ./cmd/agent
 `Ctrl+C` (또는 SIGTERM)로 정상 종료. 종료 직전 `AGENT_STOPPED` 이벤트가
 발행된다.
 
+### 종료 코드 / supervisor 정책
+
+| exit code | 의미 | supervisor 권장 동작 |
+|---|---|---|
+| `0` | 정상 signal 종료 | 재기동 안 함 |
+| `1` | 부팅 실패 또는 `job-results` / `audit-events` publish 실패 (fail-fast) | **재기동 필수** — last committed offset부터 redeliver되어 at-least-once 보장 |
+
+운영 배포 시 supervisor 설정 예:
+- systemd: `Restart=on-failure` (exit 0이면 재기동 안 함, exit 1이면 재기동)
+- Kubernetes: `restartPolicy: OnFailure` 또는 Deployment(`Always`도 동작)
+- supervisord: `autorestart=unexpected` + `exitcodes=0`
+
+supervisor 없이 데모로만 돌릴 때는 publish 실패 시 사용자가 직접 `go run`을 다시 실행해야 미처리 명령이 재배달된다.
+
 ## 동작 개요
 
 | 흐름 | 토픽 | 발행/소비 |
@@ -55,8 +69,17 @@ go run ./cmd/agent
 
 ### Job 실행 정책 (사전 결정)
 
-- **동시 실행**: `schedule_id` 단위 직렬 — 동일 schedule 재진입은 skip
-  (Nagios/Zabbix 표준).
+- **실행 모델**: 단일 consumer goroutine에서 명령을 순차 처리 (Nagios/
+  Zabbix 표준 — agent worker 단위 serial). 동일 schedule 재진입은 구조적
+  으로 불가능.
+- **at-least-once 보장**: Dispatch가 결과/감사 발행을 완료한 뒤에만
+  Kafka offset commit. publish 실패 시 즉시 exit 1로 종료 → supervisor
+  재기동 → last committed offset부터 redeliver.
+- **발행 순서**: `job-results` 먼저, 성공 시 `audit-events` (JOB_EXECUTED).
+  results 실패 시 audit은 시도하지 않음 — "audit엔 JOB_EXECUTED 있는데
+  결과 데이터 없음" 비대칭 차단. 반대 케이스(results 성공 후 audit 실패
+  → 재기동 시 results 중복)는 가능하므로 BE는 `execution_id`로 dedup
+  해야 한다.
 - **만료된 명령**: `valid_until` 지난 명령은 silent skip (spec §5.1).
 - **SCRIPT_JOB**: `timeout_seconds`로 강제 중단, `output_cap_bytes` 초과
   분은 truncate + `truncated=true`.
