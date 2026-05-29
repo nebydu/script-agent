@@ -16,8 +16,9 @@ model: sonnet
 - Kafka·OTLP 실제 연동이 필요한 검증은 e2e 영역(monitoring-meta의 e2e-tester)으로 넘긴다. 여기서 무리하게 통합 테스트를 만들지 않는다 — 만들 필요가 생기면 **사람 결정 게이트**로 멈추고 보고한다.
 
 ## 참조 우선순위
-1. **Phase 0 회귀 방지 기준**: `docs/monitoring-demo-message-spec-v0.2.1.md` — 현재 script-agent 코드가 지켜야 할 동작. 우선 검증 대상.
-2. **Phase 1 도달 검증**: `../monitoring-meta/docs/envelope.md`, `../monitoring-meta/docs/kafka-payloads.md` — 목표 spec 도달 여부 검증(해당 작업이 Phase 1 도달을 목표로 할 때).
+1. **통합본 기준 요구사항 검증**: `../monitoring-meta/docs/통합본_v0_9.md` — 이번 작업이 통합본 방향과 맞는지 확인하는 상위 기준.
+2. **Phase 0 회귀 방지 가드**: `docs/monitoring-demo-message-spec-v0.2.1.md` — 현재 script-agent 코드가 깨지지 않아야 할 동작. 회귀 테스트 우선 대상.
+3. **메시징 세부 검증**: `../monitoring-meta/docs/envelope.md`, `../monitoring-meta/docs/kafka-payloads.md` — Phase 1 도달을 목표로 하는 작업일 때 메시징 계약 도달 여부 검증.
 
 ## 강제 룰
 1. 프로덕션 코드를 절대 수정하지 않는다(`*_test.go`만 작성).
