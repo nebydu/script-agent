@@ -23,8 +23,14 @@ vendor/
 .vscode/
 .idea/
 
-# Claude Code 워크스페이스 (도구 산출물 — plan, 임시 출력 등)
-.claude/
+# Claude Code 자동화 — 자동화 정의(CLAUDE.md, settings.json, hooks, agents)는 추적하고
+# codex-gate Stop hook 런타임 상태 파일만 추적 제외 (hub .claude/ 정책과 동일)
+.claude/.codex-gate-state
+.claude/codex-gate.log
+.claude/codex-gate-escalation.log
+.claude/.codex-gate-issues.txt
+.claude/.codex-gate-stderr.txt
+.claude/.codex-last-message.json
 
 # OS
 .DS_Store

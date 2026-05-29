@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["pass", "fail"]
+    },
+    "critical_issues": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "spec_violations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "required": ["verdict", "critical_issues", "spec_violations", "summary"],
+  "additionalProperties": false
+}
