@@ -1,12 +1,42 @@
 {
+  "permissions": {
+    "deny": [
+      "Edit(./docs/**)",
+      "Write(./docs/**)",
+      "NotebookEdit(./docs/**)",
+      "Edit(../monitoring-meta/**)",
+      "Write(../monitoring-meta/**)",
+      "NotebookEdit(../monitoring-meta/**)",
+      "Edit(../hub/**)",
+      "Write(../hub/**)",
+      "NotebookEdit(../hub/**)"
+    ],
+    "additionalDirectories": [
+      "../monitoring-meta/docs",
+      "../monitoring-meta/handoff"
+    ],
+    "defaultMode": "default"
+  },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/git-bash.cmd",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/deny-write-paths.sh"]
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "C:\\Program Files\\Git\\bin\\bash.exe",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/git-bash.cmd",
             "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/codex-gate.sh"]
           }
         ]

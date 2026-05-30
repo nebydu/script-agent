@@ -24,10 +24,13 @@ log_line() { # verdict | crit_count | viol_count | triggered_files
   printf '%s | %s | %s | %s | %s\n' "$(date -Is)" "$1" "$2" "$3" "$4" >> "$LOG_FILE"
 }
 emit_system_message() { # message
-  python -c 'import json, sys; print(json.dumps({"systemMessage": sys.argv[1]}, ensure_ascii=False))' "$1"
+  # PYTHONIOENCODING=utf-8: Windows 기본 콘솔 인코딩(cp949)에서 em dash 등 non-CP949 문자를
+  # stdout에 쓸 때 UnicodeEncodeError가 나는 것을 막는다.
+  PYTHONIOENCODING=utf-8 python -c 'import json, sys; print(json.dumps({"systemMessage": sys.argv[1]}, ensure_ascii=False))' "$1"
 }
 escalate() { # message
   printf '%s | %s\n' "$(date -Is)" "$1" >> "$ESC_LOG"
+  emit_system_message "[codex-gate] 게이트 강제 통과 — 사람 확인 필요: $1"
 }
 read_state() {
   FAIL_COUNT=0; PARSE_FAIL_COUNT=0
