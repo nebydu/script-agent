@@ -41,6 +41,17 @@ func Start(ctx context.Context, endpoint, agentID string, interval time.Duration
 		return nil, fmt.Errorf("otlp http exporter: %w", err)
 	}
 
+	return startWithExporter(exporter, agentID, interval)
+}
+
+// startWithExporter는 주어진 exporter로 PeriodicReader(interval 주입) 기반
+// MeterProvider를 구성하고 resource(service.name=script-agent) + `agent.heartbeat`
+// observable gauge(=1, attribute agent_id)를 등록한다.
+//
+// Start()에서 네트워크 의존(otlpmetrichttp.New)을 분리한 부분으로, 단위 테스트가
+// stub exporter를 주입해 gauge 불변식(spec §5.4)과 interval 주입(PeriodicReader 전달)을
+// production 코드 그대로 검증할 수 있게 한다.
+func startWithExporter(exporter sdkmetric.Exporter, agentID string, interval time.Duration) (*sdkmetric.MeterProvider, error) {
 	reader := sdkmetric.NewPeriodicReader(exporter,
 		sdkmetric.WithInterval(interval),
 	)
