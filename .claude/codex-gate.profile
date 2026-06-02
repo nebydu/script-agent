@@ -2,7 +2,8 @@
 #
 # 이 파일은 script-agent가 monitoring-harness 플러그인의 공통 codex-gate 골격에 주입하는
 # 도메인 delta다. 실행 로직(골격)은 플러그인이 보유하며 여기에는 복제하지 않는다.
-# 플러그인 설치 시 userConfig.profile = 이 파일 경로로 지정한다.
+# 플러그인은 이 파일을 convention 경로(${CLAUDE_PROJECT_DIR}/.claude/codex-gate.profile)에서
+# 자동 발견하여 로드한다(별도 설정 불필요 — userConfig/per-user config 의존 없음).
 #
 # 동등성 기준: 이 값들은 기존 .claude/hooks/codex-gate.sh 동작을 그대로 재현한다.
 
