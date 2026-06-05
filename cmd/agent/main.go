@@ -204,6 +204,17 @@ func consumeCommands(ctx context.Context, reader *kafka.Reader, dispatcher *job.
 			continue
 		}
 
+		// envelope §2.3 — x-source는 폐쇄 enum이 아니며 미지값에도 dispatch가
+		// 깨지지 않음을 의도된 가드로 명시한다. 여기서는 값을 관찰(debug 로깅)만
+		// 하고, 알려진 값 여부를 판정하거나 처리·commit 흐름을 분기시키지 않는다.
+		// x-source가 미지값이거나 부재여도 명령 처리는 그대로 진행된다.
+		if source, present := kafka.SourceFromHeaders(msg.Headers); present {
+			logger.Debug("command envelope x-source observed",
+				"x_source", source,
+				"offset", msg.Offset,
+			)
+		}
+
 		var cmd model.Command
 		if err := json.Unmarshal(msg.Value, &cmd); err != nil {
 			logger.Warn("failed to unmarshal command — skipped",

@@ -32,3 +32,21 @@ func BuildHeaders(messageID, traceID string) []kgo.Header {
 func NewMessageID() string {
 	return uuid.NewString()
 }
+
+// SourceFromHeaders는 envelope 헤더(spec §2.2)에서 x-source 값을 추출한다.
+// BuildHeaders(쓰기)와 대칭인 읽기 헬퍼이며, model.HeaderSource 키를 찾아
+// 값과 존재 여부만 반환하는 순수 함수다.
+//
+// 의도적으로 폐쇄 enum / allowlist 검증을 하지 않는다(envelope §2.3 —
+// x-source의 알려진 값 목록은 비규범이며, consumer가 검증 대조할 대상이
+// 아니다). 미지값이나 부재에도 명령 처리(dispatch)가 깨지지 않음을 의도된
+// 가드로 명시하기 위해, 이 함수는 "값 추출 + 존재 여부"만 수행하고
+// skip/error 판정 boolean을 만들지 않는다.
+func SourceFromHeaders(headers []kgo.Header) (value string, present bool) {
+	for _, h := range headers {
+		if h.Key == model.HeaderSource {
+			return string(h.Value), true
+		}
+	}
+	return "", false
+}
