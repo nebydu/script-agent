@@ -1,0 +1,5 @@
+# EOL 정책 — autocrlf 의존을 제거하고 작업트리/저장소 줄바꿈을 LF로 고정한다.
+# Windows에서 core.autocrlf=true가 .go 파일을 EOL-only로 대량 "modified" 표시하던
+# 노이즈(유령 변경)를 차단한다. Go(gofmt)/bash/sh는 LF가 정본이며, 현재 repo의
+# 모든 텍스트 파일(.cmd 포함)이 이미 LF로 저장돼 있어 본 정책은 현 상태를 고정만 한다.
+* text=auto eol=lf
