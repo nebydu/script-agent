@@ -143,4 +143,3 @@ func TestScriptRunner_Run_InvalidSpec(t *testing.T) {
 		t.Errorf("Status = %q, want FAIL", result.Status)
 	}
 }
-

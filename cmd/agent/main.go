@@ -40,9 +40,10 @@ import (
 )
 
 // 종료 코드 (supervisor 재기동 정책과 직결):
-//   exitOK     = 0 — 정상 signal 종료
-//   exitFatal  = 1 — 부팅 실패 (agent_id 등) 또는 consumer self-terminate.
-//                    supervisor가 재기동 → last committed offset부터 redeliver.
+//
+//	exitOK     = 0 — 정상 signal 종료
+//	exitFatal  = 1 — 부팅 실패 (agent_id 등) 또는 consumer self-terminate.
+//	                 supervisor가 재기동 → last committed offset부터 redeliver.
 const (
 	exitOK    = 0
 	exitFatal = 1
