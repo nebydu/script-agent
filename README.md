@@ -64,7 +64,7 @@ supervisor 없이 데모로만 돌릴 때는 publish 실패 시 사용자가 직
 | Liveness | `heartbeats` | OTel Collector가 OTLP→Kafka 재발행 |
 
 세부 메시지 스키마는
-[`docs/monitoring-demo-message-spec-v0.2.1.md`](docs/monitoring-demo-message-spec-v0.2.1.md)
+[`monitoring-demo-message-spec-v0.2.1.md`](../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md)
 참조 (ground truth).
 
 ### Job 실행 정책 (사전 결정)
@@ -153,5 +153,5 @@ script-agent/
 ## 메시지 명세
 
 데모 단계의 Kafka 토픽 / 페이로드 ground truth는
-[`docs/monitoring-demo-message-spec-v0.2.1.md`](docs/monitoring-demo-message-spec-v0.2.1.md).
+[`monitoring-demo-message-spec-v0.2.1.md`](../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md).
 코드 변경은 이 문서와 정합되어야 한다.

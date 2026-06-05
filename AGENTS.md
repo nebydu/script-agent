@@ -46,5 +46,5 @@ Claude Code는 `CLAUDE.md`에서 이 파일을 import하여 동일한 규칙을 
 1. **통합본 v0.9** (`../monitoring-meta/docs/통합본_v0_9.md`) — 전체 제품 요구·아키텍처·모듈 경계·Phase 방향의 최상위 판단 기준
 2. **작업 spec** (`../monitoring-meta/handoff/<work-id>-script-agent.md`) — 이번 작업에서 script-agent가 구현할 구체 입력
 3. **코드** — 현재 script-agent의 실제 동작·제약의 사실
-4. **데모 spec v0.2.1** (`docs/monitoring-demo-message-spec-v0.2.1.md`) — Phase 0 회귀 방지 가드
+4. **데모 spec v0.2.1** (`../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md`) — Phase 0 회귀 방지 가드
 5. **envelope / kafka-payloads** (`../monitoring-meta/docs/`) — 메시징 세부 규약(Phase 1+ 도달 목표)

@@ -17,7 +17,7 @@ model: sonnet
 
 ## 참조 우선순위
 1. **통합본 기준 요구사항 검증**: `../monitoring-meta/docs/통합본_v0_9.md` — 이번 작업이 통합본 방향과 맞는지 확인하는 상위 기준.
-2. **Phase 0 회귀 방지 가드**: `docs/monitoring-demo-message-spec-v0.2.1.md` — 현재 script-agent 코드가 깨지지 않아야 할 동작. 회귀 테스트 우선 대상.
+2. **Phase 0 회귀 방지 가드**: `../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md` — 현재 script-agent 코드가 깨지지 않아야 할 동작. 회귀 테스트 우선 대상.
 3. **메시징 세부 검증**: `../monitoring-meta/docs/envelope.md`, `../monitoring-meta/docs/kafka-payloads.md` — Phase 1 도달을 목표로 하는 작업일 때 메시징 계약 도달 여부 검증.
 
 ## 강제 룰

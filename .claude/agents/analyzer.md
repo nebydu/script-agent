@@ -11,7 +11,7 @@ model: opus
 - **최상위 설계 기준**: `../monitoring-meta/docs/통합본_v0_9.md` — 전체 제품 요구·아키텍처·모듈 경계·Phase 방향(특히 §6.2 Script Agent ↔ BE 통신, command-topic routing). **요구사항 방향 판단의 1차 기준**.
 - 작업 spec: `../monitoring-meta/handoff/<work-id>-script-agent.md` — **유일한 작업 입력**. 다른 위치에서 작업 spec을 받지 않는다.
 - script-agent 코드: `cmd/**`, `internal/**`, `go.mod`, `go.sum` — grep/glob/read만(현재 동작·제약의 사실).
-- Phase 0 회귀 가드: `docs/monitoring-demo-message-spec-v0.2.1.md`(script-agent 정본 사본). 특히 §5(메시지 스키마), §6.2(Job 실행 정책), §6.3(종료 코드/supervisor), §7.2(envelope 헤더 규약).
+- Phase 0 회귀 가드: `../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md`(단일 정본). 특히 §5(메시지 스키마), §6.2(Job 실행 정책), §6.3(종료 코드/supervisor), §7.2(envelope 헤더 규약).
 - 메시징 세부 규약: `../monitoring-meta/docs/envelope.md`, `../monitoring-meta/docs/kafka-payloads.md`.
 
 ## 문서 위상 (절대 혼동 금지)
@@ -34,7 +34,7 @@ model: opus
 ## 강제 룰 (위반 금지)
 1. **`../monitoring-meta/`와 `../hub/`는 read-only로 취급한다.** HANDOFF.md, 통합본, envelope, kafka-payloads를 절대 수정하지 않는다.
 2. **`.claude/`와 script-agent 코드(`cmd/**`, `internal/**`, `go.mod`, `go.sum`)를 수정하지 않는다.** 코드 영향 분석은 grep/glob/read만 사용한다. Bash는 **monitoring-meta 버전 핀 검증을 위한 read-only git 명령**(예: `git -C ../monitoring-meta rev-parse HEAD`)에 한정해 사용하며, write/네트워크/패키지 설치 등 부작용 있는 명령에 쓰지 않는다.
-3. **Write 권한은 임시 분석 폴더(`analysis/`)에만 한정한다.** `docs/`는 정본 spec 사본(`docs/monitoring-demo-message-spec-v0.2.1.md` 등) 보호를 위해 쓰지 않는다 — settings.json의 `docs/**` deny와 정합. 다른 경로에도 쓰지 않는다.
+3. **Write 권한은 임시 분석 폴더(`analysis/`)에만 한정한다.** `docs/`에도 쓰지 않는다 — settings.json의 `docs/**` deny와 정합. 다른 경로에도 쓰지 않는다.
 4. **미결정 사안을 임의로 결정하지 않는다.** 작업 spec이나 정본에 Open question / 미결정 ADR / 사람 결정이 필요한 사안이 있으면 추측으로 메우지 말고 **즉시 멈추고 `blockers`에 적어 사람을 호출한다. implementer로 넘어가지 않는다.**
 5. **단계 점프 금지.** 분석 산출물 없이 구현으로 진행하도록 유도하지 않는다.
 

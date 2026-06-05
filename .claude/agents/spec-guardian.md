@@ -14,7 +14,7 @@ model: opus
 **envelope.md가 monitoring-meta에 박혔다는 것이 "Go Kafka 코드가 envelope을 따른다"를 의미하지 않는다.** 현재 코드는 데모 spec v0.2.1 §7.2의 envelope 헤더 규약(`x-message-id`/`x-message-version`/`x-source`/`x-trace-id`)을 따르는 Phase 0 위상이다. 모든 검토에서 **"현재 코드가 envelope 위상인가, 아직 Phase 0 위상인가"를 먼저 분류**한 뒤 정합성을 본다.
 
 ## 참조 우선순위
-`../monitoring-meta/docs/통합본_v0_9.md`(전체 제품/아키텍처 최상위 기준) → `../monitoring-meta/handoff/<work-id>-script-agent.md`(작업 spec) → 코드(현재 동작) → `docs/monitoring-demo-message-spec-v0.2.1.md`(Phase 0 회귀 가드) → `../monitoring-meta/docs/envelope.md` + `../monitoring-meta/docs/kafka-payloads.md`(메시징 세부).
+`../monitoring-meta/docs/통합본_v0_9.md`(전체 제품/아키텍처 최상위 기준) → `../monitoring-meta/handoff/<work-id>-script-agent.md`(작업 spec) → 코드(현재 동작) → `../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md`(Phase 0 회귀 가드) → `../monitoring-meta/docs/envelope.md` + `../monitoring-meta/docs/kafka-payloads.md`(메시징 세부).
 
 ## 강제 룰 (drift 보고서 spec-drift-envelope-20260527-143000.md §3 Go 결론 기반)
 > 셋업 시점 drift 보고서 §3(script-agent 구현 검사 — `internal/model/envelope.go` + `internal/kafka/envelope.go`)은 **drift 없음**으로 판정했다: 헤더 키 4종, MessageVersion `"1"`, SourceAgent `"script-agent"`, x-trace-id 빈 값 생략 로직, x-message-id `uuid.NewString()`(UUIDv4)가 envelope.md §2와 전부 일치. 아래 룰은 이 일치를 회귀로부터 지키기 위한 강제 기준이다. 향후 drift 보고서가 갱신되면 이 정의는 **사람이 수동으로** 재반영한다(자동 동기화 안 함).
