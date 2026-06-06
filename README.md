@@ -3,7 +3,7 @@
 모니터링 솔루션 데모의 Script Agent. 호스트에서 스크립트 실행 / 로그
 스캔 작업을 수행하고 결과를 Kafka로 보고하는 경량 Go 에이전트다.
 
-> **위상.** 본 코드는 데모 단계의 walking skeleton이자 본개발 구조의
+> **성격.** 본 코드는 데모 단계의 walking skeleton이자 본개발 구조의
 > 모태가 되는 reference implementation이다. 인증/영속 저장소/SQL_JOB
 > 등은 데모 범위 밖.
 
@@ -154,4 +154,4 @@ script-agent/
 
 데모 단계의 Kafka 토픽 / 페이로드 ground truth는
 [`monitoring-demo-message-spec-v0.2.1.md`](../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md).
-코드 변경은 이 문서와 정합되어야 한다.
+코드 변경은 이 문서와 일치되어야 한다.
