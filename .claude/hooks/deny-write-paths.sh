@@ -20,7 +20,9 @@ TARGET="$(printf '%s' "$INPUT" | PYTHONIOENCODING=utf-8 python -c '
 import json, sys, os
 try:
     d = json.loads(sys.stdin.read())
-    p = d.get("tool_input", {}).get("file_path", "")
+    ti = d.get("tool_input", {})
+    # NotebookEdit은 notebook_path, 일부 도구는 path를 쓴다 — hub pre-write-guard.sh와 동일한 3중 폴백
+    p = ti.get("file_path") or ti.get("notebook_path") or ti.get("path") or ""
     if not isinstance(p, str) or not p:
         sys.exit(0)
     norm = os.path.realpath(p).replace("\\", "/").lower()
