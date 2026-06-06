@@ -17,8 +17,8 @@ Job 실행 정책 불변식 / 패키지 의존 방향 / 결합도 / 명명 / 에
 
 ### critical — 데모 spec v0.2.1 §6.2 Job 실행 정책 불변식 위반
 1. **at-least-once 위반** — 결과/감사 발행 완료 전에 Kafka offset commit. (정상: `cmd/agent/main.go` consumeCommands가 fetch → dispatch 완료 → commit 순서)
-2. **fail-fast 위반** — `job-results`/`audit-events` publish 실패 시 `exit 1`(consumer self-terminate) 아닌 경로로 진행.
-3. **발행 순서 위반** — `job-results`보다 `audit-events`(JOB_EXECUTED)를 먼저 발행하거나, results 실패 후 audit을 시도. (정상: `internal/job/dispatcher.go`가 results.Publish → auditor.JobExecuted)
+2. **fail-fast 위반** — `job-results`/`audit-topic` publish 실패 시 `exit 1`(consumer self-terminate) 아닌 경로로 진행.
+3. **발행 순서 위반** — `job-results`보다 `audit-topic`(JOB_EXECUTED)를 먼저 발행하거나, results 실패 후 audit을 시도. (정상: `internal/job/dispatcher.go`가 results.Publish → auditor.JobExecuted)
 4. **valid_until 미처리** — `valid_until` 지난 명령을 silent skip 하지 않음.
 5. **직렬 처리 모델 파괴** — 단일 consumer goroutine 직렬 처리 모델을 깨는 동시 실행(동일 schedule 재진입 가능 구조).
 6. **LOG_JOB rotation 누락** — LOG_JOB의 `file_id`(inode/file index) 변경·size shrink 시 재시작 누락. (정상: `internal/job/log.go` + `filestate*.go`)

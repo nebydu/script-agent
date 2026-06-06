@@ -182,7 +182,7 @@ func TestDispatcher_ResultsPublishFailureReturnsError(t *testing.T) {
 	}
 }
 
-// TestDispatcher_AuditPublishFailureReturnsError: audit-events 발행 실패도
+// TestDispatcher_AuditPublishFailureReturnsError: audit-topic 발행 실패도
 // error 반환 (job-results 성공 여부 무관).
 func TestDispatcher_AuditPublishFailureReturnsError(t *testing.T) {
 	runner := newFakeRunner()
