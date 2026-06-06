@@ -3,10 +3,10 @@
 // 라이프사이클:
 //  1. config 로드, slog 초기화
 //  2. agent_id 영속 (spec §3.1)
-//  3. Kafka writer / commands reader 초기화
+//  3. Kafka writer / command-topic reader 초기화
 //  4. Dispatcher + Runners 구성 (Runners는 단계 D/E에서 등록)
 //  5. AGENT_STARTED 발행 (best-effort)
-//  6. commands consumer goroutine 시작
+//  6. command-topic consumer goroutine 시작
 //  7. signal 또는 consumer 자기 종료(publish 실패 등) 대기
 //  8. consumer cancel — 진행 중인 Dispatch도 ctx cancel로 조기 종료
 //  9. AGENT_STOPPED 발행 (5s budget) + writer close
@@ -112,7 +112,7 @@ func run() int {
 		"agent_version", cfg.AgentVersion,
 	)
 
-	// commands consumer. consumer가 publish 실패 등으로 자기 종료할 수
+	// command-topic consumer. consumer가 publish 실패 등으로 자기 종료할 수
 	// 있으므로 error도 보관 — main이 signal 또는 consumer 종료 중 먼저
 	// 발생한 쪽을 reason으로 삼는다.
 	consumerDone := make(chan struct{})
@@ -183,7 +183,7 @@ func run() int {
 	return exitCode
 }
 
-// consumeCommands는 commands 토픽을 끝없이 fetch + dispatch한다.
+// consumeCommands는 command-topic 토픽을 끝없이 fetch + dispatch한다.
 //
 // 반환값:
 //   - nil + ctx cancelled: 정상 shutdown 경로

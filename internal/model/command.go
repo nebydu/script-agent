@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Command는 commands 토픽에서 수신하는 BE→Agent 명령이다. spec §5.1.
+// Command는 command-topic 토픽에서 수신하는 BE→Agent 명령이다. spec §5.1.
 //
 // Spec 필드는 job_type별 구조가 다르므로 json.RawMessage로 보존한 뒤,
 // 호출 측이 JobType을 확인한 후 ScriptJobSpec 또는 LogJobSpec으로

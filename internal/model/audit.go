@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-// AuditEvent는 audit-events 토픽으로 발행하는 감사 이벤트다. spec §5.3.
+// AuditEvent는 audit-topic 토픽으로 발행하는 감사 이벤트다. spec §5.3.
 //
 // Metadata는 action별 자유 형식이므로 map[string]any로 둔다.
 // JOB_EXECUTED의 OccurredAt은 Job 실행 종료 시각(= JobResult.FinishedAt)으로

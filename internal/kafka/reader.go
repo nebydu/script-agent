@@ -8,7 +8,7 @@ import (
 //
 // 기본 정책 (spec ADR #4, 사전 확정):
 //   - GroupID: "script-agent-<agent_id>" — Agent별 unique consumer group.
-//     모든 Agent가 동일 commands 토픽에서 전체 메시지를 받고
+//     모든 Agent가 동일 command-topic 토픽에서 전체 메시지를 받고
 //     payload.target_agent_id로 자기 것을 필터링한다 (spec §5.1).
 //   - StartOffset: LastOffset (latest). 새 consumer group 생성 시점
 //     이후의 명령만 구독. 모니터링 Agent 표준.
@@ -19,7 +19,7 @@ type Reader struct {
 	r *kgo.Reader
 }
 
-// NewReader는 commands 토픽용 Reader를 만든다.
+// NewReader는 command-topic 토픽용 Reader를 만든다.
 func NewReader(brokers, topic, agentID string) *Reader {
 	r := kgo.NewReader(kgo.ReaderConfig{
 		Brokers:     splitBrokers(brokers),

@@ -1,4 +1,4 @@
-// Package audit는 audit-events 토픽으로 발행하는 감사 이벤트
+// Package audit는 audit-topic 토픽으로 발행하는 감사 이벤트
 // (spec §5.3) 생성과 발행을 담당한다.
 //
 // 데모 단계 audit 액션 3종:
@@ -21,7 +21,7 @@ import (
 	"monitoring/script-agent/internal/model"
 )
 
-// Publisher는 audit-events 토픽 발행자다.
+// Publisher는 audit-topic 토픽 발행자다.
 // Agent 단위 정보(agent_id, version, hostname, os)는 생성 시점에 캐시.
 type Publisher struct {
 	writer       *kafka.Writer

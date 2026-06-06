@@ -25,9 +25,9 @@ type AuditPublisher interface {
 //   - target_agent_id가 자기 것이 아니면 무시 (spec §5.1).
 //   - valid_until이 지났으면 silent skip (spec §5.1).
 //   - 그 외에는 Runner.Run을 호출하고, 결과를 job-results 토픽과
-//     audit-events 토픽에 각각 발행한 뒤 반환.
+//     audit-topic 토픽에 각각 발행한 뒤 반환.
 //
-// 동기 처리의 이유: 호출 측(commands consumer)이 Dispatch 반환 후에만
+// 동기 처리의 이유: 호출 측(command-topic consumer)이 Dispatch 반환 후에만
 // Kafka offset을 commit해야 at-least-once가 성립한다. 이전 비동기 구현은
 // goroutine spawn 직후 commit이 일어나 at-most-once 손실이 가능했다 —
 // Agent crash 시 진행 중이던 명령이 재처리되지 않음.
@@ -78,7 +78,7 @@ func NewDispatcher(
 // 반환값 non-nil = "commit 금지 / redeliver 필요":
 //   - Runner 시스템 오류 (ctx 취소 등) → 결과 자체 의미 없음
 //   - job-results 발행 실패 → audit 시도 없이 즉시 반환
-//   - audit-events 발행 실패
+//   - audit-topic 발행 실패
 //
 // 발행 순서가 results 먼저 → audit 나중인 이유: results 실패 시 audit을
 // skip하면 "audit에는 JOB_EXECUTED 있는데 정작 결과는 없음"이라는 가장
