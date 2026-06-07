@@ -9,7 +9,11 @@
 #   "profile: .../proposal-review.profile"이면 주입 성공, "none"이면 degraded.
 
 # repo 루트 기준 절대경로로 해석 (호출 cwd 무관하게 동작)
-_SA_ROOT="$(git rev-parse --show-toplevel)"
+# - git rev-parse는 cwd 의존이라 repo 밖 cwd에서 source 시 즉사, 다른 repo cwd에서는
+#   엉뚱한 root로 조용히 진행하는 결함이 있었다 → profile 파일 위치 기준으로 산출.
+# - 의미: 이 파일이 놓인 디렉터리(.claude/)의 부모 = repo root. convention 위치를
+#   벗어난 곳에 profile을 두면 그 위치 기준으로 해석된다. (infra b47fcef와 동일 조치)
+_SA_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # 문맥 문서 — ground truth 우선순위(.claude/CLAUDE.md §2)를 반영.
 # 통합본_v0_9.md(170KB)는 매 리뷰 주입 비용이 커서 제외(아래 POLICY에서 안내).
