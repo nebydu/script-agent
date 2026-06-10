@@ -10,7 +10,7 @@ model: opus
 ## 입력
 - analyzer 산출물(`analysis/` 또는 analyzer가 보고한 분석 본문).
 - 최상위 설계 기준: `../monitoring-meta/docs/통합본_v0_9.md`(읽기 전용) — 구현 방향이 통합본과 충돌하지 않는지 확인.
-- 작업 spec: `../monitoring-meta/handoff/<work-id>-script-agent.md`(읽기 전용).
+- 작업 spec: `../monitoring-meta/handoff/<work-id>/<work-id>-script-agent.md`(읽기 전용).
 - Phase 0 회귀 가드: `../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md`.
 
 ## Write 권한

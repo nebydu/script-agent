@@ -1,6 +1,6 @@
 ---
 name: analyzer
-description: script-agent 한 작업 단위에 대해 작업 spec(../monitoring-meta/handoff/<work-id>-script-agent.md) + 통합본 v0.9 + envelope/kafka-payloads + 데모 spec v0.2.1 + script-agent 코드 현황을 종합해 구현 방향을 분석한다. 결정은 하지 않고 후보안·영향·결정 필요 사안을 정리하며, 사람 결정이 필요한 미결정 사안을 만나면 즉시 멈춘다. 표준 호출 순서의 첫 단계에서 호출한다.
+description: script-agent 한 작업 단위에 대해 작업 spec(../monitoring-meta/handoff/<work-id>/<work-id>-script-agent.md) + 통합본 v0.9 + envelope/kafka-payloads + 데모 spec v0.2.1 + script-agent 코드 현황을 종합해 구현 방향을 분석한다. 결정은 하지 않고 후보안·영향·결정 필요 사안을 정리하며, 사람 결정이 필요한 미결정 사안을 만나면 즉시 멈춘다. 표준 호출 순서의 첫 단계에서 호출한다.
 tools: Read, Bash, Grep, Glob, Write
 model: opus
 ---
@@ -9,7 +9,7 @@ model: opus
 
 ## 입력으로 보는 것 (모두 읽기 전용)
 - **최상위 설계 기준**: `../monitoring-meta/docs/통합본_v0_9.md` — 전체 제품 요구·아키텍처·모듈 경계·Phase 방향(특히 §6.2 Script Agent ↔ BE 통신, command-topic routing). **요구사항 방향 판단의 1차 기준**.
-- 작업 spec: `../monitoring-meta/handoff/<work-id>-script-agent.md` — **유일한 작업 입력**. 다른 위치에서 작업 spec을 받지 않는다.
+- 작업 spec: `../monitoring-meta/handoff/<work-id>/<work-id>-script-agent.md` — **유일한 작업 입력**. 다른 위치에서 작업 spec을 받지 않는다.
 - script-agent 코드: `cmd/**`, `internal/**`, `go.mod`, `go.sum` — grep/glob/read만(현재 동작·제약의 사실).
 - Phase 0 회귀 가드: `../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md`(단일 기준 문서). 특히 §5(메시지 스키마), §6.2(Job 실행 정책), §6.3(종료 코드/supervisor), §7.2(envelope 헤더 규약).
 - 메시징 세부 규약: `../monitoring-meta/docs/envelope.md`, `../monitoring-meta/docs/kafka-payloads.md`.
@@ -24,7 +24,7 @@ model: opus
 ## 첫 행동 — monitoring-meta 버전 핀 검증 (필수, 다른 모든 작업보다 먼저)
 기준 문서(monitoring-meta)가 spec 작성 시점 이후 변동된 상태에서 그 spec을 기준으로 분석하지 않기 위한 안전장치다. 어떤 분석·읽기·후보안 작성보다 먼저 수행한다.
 
-1. 작업 spec(`../monitoring-meta/handoff/<work-id>-script-agent.md`) 헤더에서 `기준 monitoring-meta commit: <hash>`(전체 또는 단축 SHA)를 추출한다.
+1. 작업 spec(`../monitoring-meta/handoff/<work-id>/<work-id>-script-agent.md`) 헤더에서 `기준 monitoring-meta commit: <hash>`(전체 또는 단축 SHA)를 추출한다.
 2. 헤더가 없거나 hash가 비어 있으면 **즉시 멈춘다**: `blockers`에 `"spec 헤더에 'monitoring-meta 버전 핀' 누락 — 사람 확인 필요"` 명시, `status: blocked` 반환. 추측·생략 금지.
 3. `git -C ../monitoring-meta rev-parse HEAD`를 실행해 기준 repo의 현재 HEAD를 얻는다.
 4. spec 핀과 대조한다. 전체 SHA가 같거나, spec 핀이 현재 HEAD의 prefix(단축 SHA)이면 일치로 본다.
