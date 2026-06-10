@@ -1,13 +1,13 @@
 // Package heartbeat은 OTel 메트릭 SDK를 구성해 `agent.heartbeat` Gauge를
 // 주기적으로 OTLP HTTP exporter로 발행한다. OTel Collector가 이를 받아
-// Kafka `heartbeats` 토픽으로 재발행하며, Kafka wire 인코딩은 Collector(infra)
+// Kafka `heartbeats-topic` 토픽으로 재발행하며, Kafka wire 인코딩은 Collector(infra)
 // 책임이다 — Agent는 OTLP HTTP push만 하므로 인코딩과 무관하다.
 //
 // 인코딩 위상(참고): Phase 0 baseline은 otlp_json(데모 spec §5.4), Phase 1에서
 // otlp_proto(protobuf)로 전환한다(ADR-0002 A-1, Accepted). 어느 쪽이든 이
 // 패키지 코드는 변경되지 않는다.
 //
-// Agent 코드는 Kafka heartbeats 토픽을 직접 다루지 않는다 — OTel 표준
+// Agent 코드는 Kafka heartbeats-topic 토픽을 직접 다루지 않는다 — OTel 표준
 // metric 파이프라인을 따른다 (spec 5.4 / ADR #2/13).
 package heartbeat
 

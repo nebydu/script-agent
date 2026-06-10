@@ -1,6 +1,6 @@
 // Package model은 메시지 spec v0.2.1의 Kafka 메시지 구조체와 enum을
 // 정의한다. Agent가 직접 다루는 토픽(command-topic / job-results /
-// audit-topic)만 포함하며, heartbeats는 OTel Collector가 발행하므로
+// audit-topic)만 포함하며, heartbeats-topic은 OTel Collector가 발행하므로
 // (spec §5.4) Agent model에서 다루지 않는다.
 //
 // 모든 도메인 timestamp는 RFC3339 (spec §2.5). time.Time을 그대로
