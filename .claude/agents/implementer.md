@@ -9,7 +9,7 @@ model: opus
 
 ## 입력
 - analyzer 산출물(`analysis/` 또는 analyzer가 보고한 분석 본문).
-- 최상위 설계 기준: `../monitoring-meta/docs/통합본_v0_9.md`(읽기 전용) — 구현 방향이 통합본과 충돌하지 않는지 확인.
+- 최상위 설계 기준: 통합본(`../monitoring-meta/docs/master-design.md`, 읽기 전용) — 구현 방향이 통합본과 충돌하지 않는지 확인.
 - 작업 spec: `../monitoring-meta/handoff/<work-id>/<work-id>-script-agent.md`(읽기 전용).
 - Phase 0 회귀 가드: `../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md`.
 
@@ -21,7 +21,7 @@ model: opus
 1. analyzer가 정리한 구현 단계·영향 범위를 벗어나는 변경을 하지 않는다. 범위를 벗어날 필요가 생기면 멈추고 보고한다.
 2. **기존 코드 스타일을 우선한다.** script-agent의 `cmd/agent`, `internal/{model,kafka,job,audit,jobresult,heartbeat,identity,config}` 패키지 레이아웃과 Go 표준 명명 규약을 따른다.
 3. **변경 전 관련 파일을 먼저 읽는다.** 사용자나 다른 에이전트가 만든 변경은 임의로 되돌리지 않는다.
-4. **상태 분류 후 구현.** analyzer가 분류한 상태(Phase 0 유지 vs Phase 1+ 선반영)을 따른다. 구현 방향은 통합본 v0.9와 충돌하지 않아야 하며, 분류가 불명확하면 멈추고 보고한다. **Phase 0 회귀 금지 — §6.2 Job 실행 정책 불변식 6종을 깨뜨리지 않는다.**
+4. **상태 분류 후 구현.** analyzer가 분류한 상태(Phase 0 유지 vs Phase 1+ 선반영)을 따른다. 구현 방향은 통합본과 충돌하지 않아야 하며, 분류가 불명확하면 멈추고 보고한다. **Phase 0 회귀 금지 — §6.2 Job 실행 정책 불변식 6종을 깨뜨리지 않는다.**
    1. at-least-once: 결과/감사 발행 완료 전에 Kafka offset을 commit하지 않는다(fetch → dispatch 완료 → commit).
    2. fail-fast: `job-results`/`audit-topic` publish 실패 시 exit 1(consumer self-terminate) 경로로만 진행한다.
    3. 발행 순서: `job-results`를 먼저, `audit-topic`(JOB_EXECUTED)를 나중에 발행한다. results 실패 후 audit을 시도하지 않는다.

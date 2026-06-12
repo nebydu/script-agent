@@ -16,7 +16,7 @@
 _SA_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # 문맥 문서 — ground truth 우선순위(.claude/CLAUDE.md §2)를 반영.
-# 통합본_v0_9.md(170KB)는 매 리뷰 주입 비용이 커서 제외(아래 POLICY에서 안내).
+# 통합본 master-design.md(170KB)는 매 리뷰 주입 비용이 커서 제외(아래 POLICY에서 안내).
 # ../monitoring-meta 형제 경로는 workspace 배치 의존 — 없으면 runner가 warn 후 건너뛴다.
 PROPOSAL_REVIEW_CONTEXT_DOCS=(
   "$_SA_ROOT/README.md"
@@ -26,4 +26,4 @@ PROPOSAL_REVIEW_CONTEXT_DOCS=(
   "$_SA_ROOT/../monitoring-meta/docs/envelope.md"
 )
 
-PROPOSAL_REVIEW_POLICY="script-agent는 Go 런타임 코드 repo다. 결정 리뷰 시 지킬 기준: 방향 판단의 최상위 기준은 통합본 v0.9(이 입력에 미포함, 170KB라 제외 — ../monitoring-meta/docs/통합본_v0_9.md)이고, 데모 spec v0.2.1은 Phase 0 회귀 방지 가드다. 제안이 'Phase 0 유지'인지 'Phase 1+ 선반영'인지 분류하지 않았으면 결함으로 지적하라. 통합본의 Phase 1+ 목표를 Phase 0 코드에 무조건 강제하는 제안, [Open]/미결정 ADR을 결정된 것으로 전제한 제안, 형제 repo(hub/monitoring-meta/infra)를 script-agent가 직접 수정하는 것을 전제한 제안은 block 대상이다. 코드 작업 spec은 ../monitoring-meta/handoff/<work-id>/<work-id>-script-agent.md 경유가 원칙이므로 이를 우회하는 프로세스 제안도 결함으로 지적하라. 통합본이 직접 쟁점인데 발췌가 없으면 missing_context로 지적하라."
+PROPOSAL_REVIEW_POLICY="script-agent는 Go 런타임 코드 repo다. 결정 리뷰 시 지킬 기준: 방향 판단의 최상위 기준은 통합본(이 입력에 미포함, 170KB라 제외 — ../monitoring-meta/docs/master-design.md)이고, 데모 spec v0.2.1은 Phase 0 회귀 방지 가드다. 제안이 'Phase 0 유지'인지 'Phase 1+ 선반영'인지 분류하지 않았으면 결함으로 지적하라. 통합본의 Phase 1+ 목표를 Phase 0 코드에 무조건 강제하는 제안, [Open]/미결정 ADR을 결정된 것으로 전제한 제안, 형제 repo(hub/monitoring-meta/infra)를 script-agent가 직접 수정하는 것을 전제한 제안은 block 대상이다. 코드 작업 spec은 ../monitoring-meta/handoff/<work-id>/<work-id>-script-agent.md 경유가 원칙이므로 이를 우회하는 프로세스 제안도 결함으로 지적하라. 통합본이 직접 쟁점인데 발췌가 없으면 missing_context로 지적하라."

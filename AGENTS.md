@@ -43,7 +43,7 @@ Claude Code는 `CLAUDE.md`에서 이 파일을 import하여 동일한 규칙을 
 
 ## 기준 문서 우선순위
 > 운영 원칙: **통합본 우선 + Phase 분류 + 데모 회귀 방지**. 통합본을 방향 판단의 최상위 기준으로 두되, 통합본의 Phase 1+ 목표를 현재 Phase 0 코드에 무조건 강제하지 않는다(불필요한 fail 방지). 작업마다 Phase 0 유지인지 Phase 1+ 선반영인지 먼저 분류한다.
-1. **통합본 v0.9** (`../monitoring-meta/docs/통합본_v0_9.md`) — 전체 제품 요구·아키텍처·모듈 경계·Phase 방향의 최상위 판단 기준
+1. **통합본** (`../monitoring-meta/docs/master-design.md`) — 전체 제품 요구·아키텍처·모듈 경계·Phase 방향의 최상위 판단 기준
 2. **작업 spec** (`../monitoring-meta/handoff/<work-id>/<work-id>-script-agent.md`) — 이번 작업에서 script-agent가 구현할 구체 입력
 3. **코드** — 현재 script-agent의 실제 동작·제약의 사실
 4. **데모 spec v0.2.1** (`../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md`) — Phase 0 회귀 방지 가드
