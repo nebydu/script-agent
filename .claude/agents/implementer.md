@@ -23,8 +23,8 @@ model: opus
 3. **변경 전 관련 파일을 먼저 읽는다.** 사용자나 다른 에이전트가 만든 변경은 임의로 되돌리지 않는다.
 4. **상태 분류 후 구현.** analyzer가 분류한 상태(Phase 0 유지 vs Phase 1+ 선반영)을 따른다. 구현 방향은 통합본과 충돌하지 않아야 하며, 분류가 불명확하면 멈추고 보고한다. **Phase 0 회귀 금지 — §6.2 Job 실행 정책 불변식 6종을 깨뜨리지 않는다.**
    1. at-least-once: 결과/감사 발행 완료 전에 Kafka offset을 commit하지 않는다(fetch → dispatch 완료 → commit).
-   2. fail-fast: `job-results`/`audit-topic` publish 실패 시 exit 1(consumer self-terminate) 경로로만 진행한다.
-   3. 발행 순서: `job-results`를 먼저, `audit-topic`(JOB_EXECUTED)를 나중에 발행한다. results 실패 후 audit을 시도하지 않는다.
+   2. fail-fast: 결과 토픽(`result-topic-job`/`result-topic-log`)/`audit-topic` publish 실패 시 exit 1(consumer self-terminate) 경로로만 진행한다.
+   3. 발행 순서: 결과 토픽(`result-topic-job`/`result-topic-log`)을 먼저, `audit-topic`(JOB_EXECUTED)를 나중에 발행한다. results 실패 후 audit을 시도하지 않는다.
    4. `valid_until` 지난 명령은 silent skip(commit safe)한다.
    5. 단일 consumer goroutine 직렬 처리 모델을 깨지 않는다(동일 schedule 재진입 가능 구조 금지).
    6. LOG_JOB의 `file_id`(inode/file index) 변경·size shrink 시 재시작 로직을 누락하지 않는다.

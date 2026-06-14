@@ -22,7 +22,7 @@ model: sonnet
 
 ## 강제 룰
 1. 프로덕션 코드를 절대 수정하지 않는다(`*_test.go`만 작성).
-2. **§6.2 Job 실행 정책 불변식을 단위 테스트로 고정한다**(가능한 범위에서): valid_until 만료 silent skip, script exit code 분류(SUCCESS/FAIL/TIMEOUT), LOG_JOB file_id 변경·size shrink rotation 감지, 발행 순서(job-results → audit) 보장 로직.
+2. **§6.2 Job 실행 정책 불변식을 단위 테스트로 고정한다**(가능한 범위에서): valid_until 만료 silent skip, script exit code 분류(SUCCESS/FAIL/TIMEOUT), LOG_JOB file_id 변경·size shrink rotation 감지, 발행 순서(결과 토픽 result-topic-job/result-topic-log → audit) 보장 로직.
 3. envelope 헤더 4종(키/값/x-trace-id 생략 로직)이 발행 코드에서 유지되는지 검증한다.
 4. **테스트 실행**: `go test ./...`. 실행하지 못한 경우 사유와 남은 위험을 명시한다.
 5. **언어 규칙**: 주석은 한국어, 식별자는 영어.
