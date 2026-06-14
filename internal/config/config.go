@@ -28,8 +28,11 @@ type Config struct {
 	// KafkaTopicCommands는 BE→Agent 명령 토픽 (spec §1).
 	KafkaTopicCommands string
 
-	// KafkaTopicJobResults는 Agent→BE Job 결과 토픽 (spec §1).
-	KafkaTopicJobResults string
+	// KafkaTopicResultJob은 SCRIPT_JOB 결과 토픽이다 (T4-2 result-topic 분리).
+	KafkaTopicResultJob string
+
+	// KafkaTopicResultLog은 LOG_JOB 결과 토픽이다 (T4-2 result-topic 분리).
+	KafkaTopicResultLog string
 
 	// KafkaTopicAuditEvents는 Agent→BE 감사 이벤트 토픽 (spec §1).
 	KafkaTopicAuditEvents string
@@ -54,7 +57,8 @@ func Load() Config {
 		LogLevel:              getenv("LOG_LEVEL", "info"),
 		KafkaBrokers:          getenv("KAFKA_BROKERS", "localhost:9092"),
 		KafkaTopicCommands:    getenv("KAFKA_TOPIC_COMMANDS", "command-topic"),
-		KafkaTopicJobResults:  getenv("KAFKA_TOPIC_JOB_RESULTS", "job-results"),
+		KafkaTopicResultJob:   getenv("KAFKA_TOPIC_RESULT_JOB", "result-topic-job"),
+		KafkaTopicResultLog:   getenv("KAFKA_TOPIC_RESULT_LOG", "result-topic-log"),
 		KafkaTopicAuditEvents: getenv("KAFKA_TOPIC_AUDIT_EVENTS", "audit-topic"),
 		LogStateDir:           getenv("LOG_STATE_DIR", "./.agent_state"),
 		OTLPEndpoint:          getenv("OTLP_ENDPOINT", "http://localhost:4318"),

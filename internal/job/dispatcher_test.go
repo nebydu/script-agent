@@ -157,8 +157,8 @@ func TestDispatcher_PublishesAfterRunBeforeReturn(t *testing.T) {
 	}
 }
 
-// TestDispatcher_ResultsPublishFailureReturnsError: job-results 발행 실패는
-// error 반환 + audit은 시도하지 않음 (비대칭 실패 시 "audit만 남는" 케이스
+// TestDispatcher_ResultsPublishFailureReturnsError: 결과 토픽(result-topic-job/log)
+// 발행 실패는 error 반환 + audit은 시도하지 않음 (비대칭 실패 시 "audit만 남는" 케이스
 // 차단 — godoc 참조).
 func TestDispatcher_ResultsPublishFailureReturnsError(t *testing.T) {
 	runner := newFakeRunner()
@@ -183,7 +183,7 @@ func TestDispatcher_ResultsPublishFailureReturnsError(t *testing.T) {
 }
 
 // TestDispatcher_AuditPublishFailureReturnsError: audit-topic 발행 실패도
-// error 반환 (job-results 성공 여부 무관).
+// error 반환 (결과 토픽 발행 성공 여부 무관).
 func TestDispatcher_AuditPublishFailureReturnsError(t *testing.T) {
 	runner := newFakeRunner()
 	close(runner.release)
@@ -201,9 +201,9 @@ func TestDispatcher_AuditPublishFailureReturnsError(t *testing.T) {
 	if !errors.Is(err, publishErr) {
 		t.Errorf("Dispatch err = %v, want wrap of %v", err, publishErr)
 	}
-	// job-results는 성공했어도 audit 실패면 전체가 fail-fast.
+	// 결과 토픽은 성공했어도 audit 실패면 전체가 fail-fast.
 	if len(results.received) != 1 {
-		t.Errorf("results.received = %d, want 1 (job-results는 publish됐어야)", len(results.received))
+		t.Errorf("results.received = %d, want 1 (결과 토픽은 publish됐어야)", len(results.received))
 	}
 }
 

@@ -1,14 +1,15 @@
 // Package model은 메시지 spec v0.2.1의 Kafka 메시지 구조체와 enum을
-// 정의한다. Agent가 직접 다루는 토픽(command-topic / job-results /
-// audit-topic)만 포함하며, heartbeats-topic은 OTel Collector가 발행하므로
-// (spec §5.4) Agent model에서 다루지 않는다.
+// 정의한다. Agent가 직접 다루는 토픽(command-topic / result-topic-job /
+// result-topic-log / audit-topic)만 포함하며, heartbeats-topic은 OTel
+// Collector가 발행하므로 (spec §5.4) Agent model에서 다루지 않는다.
 //
 // 모든 도메인 timestamp는 RFC3339 (spec §2.5). time.Time을 그대로
 // 사용하며, 발행 측에서 .UTC().Truncate(time.Second)로 정규화한다.
 package model
 
-// JobType은 command-topic / job-results 페이로드의 job_type 필드값이다.
-// spec §5.1, §5.2.
+// JobType은 command-topic / 결과 토픽 페이로드의 job_type 필드값이다.
+// T4-2 result-topic 분리 후 결과 토픽 선택 기준이기도 하다
+// (SCRIPT_JOB→result-topic-job, LOG_JOB→result-topic-log). spec §5.1, §5.2.
 type JobType string
 
 const (
@@ -16,7 +17,7 @@ const (
 	JobTypeLog    JobType = "LOG_JOB"
 )
 
-// JobStatus는 job-results 페이로드의 status 필드값이다. spec §5.2.3.
+// JobStatus는 결과 토픽 페이로드의 status 필드값이다. spec §5.2.3.
 type JobStatus string
 
 const (

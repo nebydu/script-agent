@@ -2,7 +2,8 @@ package model
 
 import "time"
 
-// JobResult는 job-results 토픽으로 발행하는 Agent→BE 결과다. spec §5.2.
+// JobResult는 결과 토픽으로 발행하는 Agent→BE 결과다. T4-2 result-topic
+// 분리로 job_type에 따라 result-topic-job/result-topic-log로 발행된다. spec §5.2.
 //
 // Script / Log 필드는 pointer로 둬서 nil이면 JSON에서 null로
 // 직렬화된다 (spec 예시 5.2.1 / 5.2.2 형식 일치). SCRIPT_JOB이면

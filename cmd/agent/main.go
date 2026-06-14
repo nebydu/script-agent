@@ -75,7 +75,7 @@ func run() int {
 	}()
 
 	auditor := audit.NewPublisher(writer, cfg.KafkaTopicAuditEvents, agentID, cfg.AgentVersion)
-	results := jobresult.NewPublisher(writer, cfg.KafkaTopicJobResults)
+	results := jobresult.NewPublisher(writer, cfg.KafkaTopicResultJob, cfg.KafkaTopicResultLog)
 
 	runners := map[model.JobType]job.Runner{
 		model.JobTypeScript: job.NewScriptRunner(),
