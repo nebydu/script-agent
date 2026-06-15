@@ -9,9 +9,15 @@ model: opus
 
 ## 입력
 - analyzer 산출물(`analysis/` 또는 analyzer가 보고한 분석 본문).
+- proposal-review 체크포인트 아티팩트: `analysis/<work-id>/proposal-review.json`(메인 세션이 CLAUDE.md §5 체크포인트에서 `--out`으로 생성). **handoff 기반 작업의 필수 입력.**
 - 최상위 설계 기준: 통합본(`../monitoring-meta/docs/master-design.md`, 읽기 전용) — 구현 방향이 통합본과 충돌하지 않는지 확인.
 - 작업 spec: `../monitoring-meta/handoff/<work-id>/<work-id>-script-agent.md`(읽기 전용).
 - Phase 0 회귀 가드: `../monitoring-meta/docs/phase0-snapshot/monitoring-demo-message-spec-v0.2.1.md`.
+
+## proposal-review 게이트 (handoff 기반 작업의 구현 선행조건)
+handoff 기반 작업에서 implementer는 **두 입력이 모두 있어야** 구현을 시작한다: (1) analyzer 산출물, (2) proposal-review 체크포인트 아티팩트 `analysis/<work-id>/proposal-review.json`(메인 세션이 CLAUDE.md §5에서 생성).
+
+아티팩트의 verdict가 `approve`가 아니거나, `confidence: low` / `missing_context` 존재 / degraded(`.claude/proposal-review.profile` 없음)면 **구현하지 않고 `status: blocked`로 즉시 종료**하고 `blockers`에 사유를 적어 사람에게 보고한다. 아티팩트가 없으면(체크포인트 미수행) 단계 점프이므로 마찬가지로 멈춘다.
 
 ## Write 권한
 - **허용**: `cmd/**`, `internal/**`, `go.mod`, `go.sum`, 관련 리소스.
@@ -42,7 +48,9 @@ model: opus
   "outputs": ["수정/생성한 파일 경로"],
   "findings": ["구현 요약, 빌드/테스트 결과"],
   "blockers": ["3회 초과 실패 사유 등 사람 escalation 항목"],
-  "next_action": "tester 호출 등 다음 단계 한 줄"
+  "next_action": "tester 호출 등 다음 단계 한 줄",
+  "proposal_review_artifact": "analysis/<work-id>/proposal-review.json",
+  "proposal_review_verdict": "approve | revise | block | (없음)"
 }
 ```
 마지막에 **"외부 surface"** 섹션을 두고 script-agent 외부(monitoring-meta, hub, infra) 파급 이슈를 분류해 적는다.
